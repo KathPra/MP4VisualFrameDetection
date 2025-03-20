@@ -58,14 +58,14 @@ if __name__ == "__main__":
     parser.add_argument('--dataset', type=str, required=True, help='Name of the dataset')
     parser.add_argument('--model_config', type=str, required=True, help='Model configuration name')
     parser.add_argument('--embs', type=str, required=True, help='Path to the embeddings file')
-    parser.add_argument('--setting', type=str, required=True, help='Ablation (Train/Test) or Evaluation (Test).')
+    parser.add_argument('--setting', type=str, required=True, help='ablation (Train/Test) or evaluation (Test).')
     args = parser.parse_args()
 
     # Load embedding dictionary
     embs = torch.load(f"{args.embs}/{args.dataset}_{args.model_config}.torch")
 
-    # if Ablation setting, load 2 train/test split
-    if args.setting == "Ablation":
+    # if ablation setting, load 2 train/test split
+    if args.setting == "ablation":
         # train test split
         train = glob.glob(f"../../Datasets/{args.dataset}/train/*/*.JPEG")
         train = [x.split("/")[-1] for x in train]
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         torch.save(distances_train, f"results/emb_dist/cossim_{args.dataset}_train_{args.model_config}.torch")
         torch.save(distances_train, f"results/emb_dist/cossim_{args.dataset}_val_{args.model_config}.torch")
 
-    else:
+    elif args.setting == "evaluation":
         # Compute distances
         distances, distr, data_ids = compute_cossim(embs)
 
@@ -97,3 +97,6 @@ if __name__ == "__main__":
         histo, bin_edges = np.histogram(distr)
         for i in range(len(histo)):
             print("bin ", bin_edges[i], "-", bin_edges[i + 1], "contains", histo[i], "samples")
+
+    else:
+        raise ValueError("Invalid setting. Choose either 'ablation' or 'evaluation'.")
