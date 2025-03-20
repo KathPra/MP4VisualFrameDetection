@@ -21,17 +21,49 @@ To this end the following steps are necessary:
 
 ## Set-Up
 
-Env: The input for multicut solver needs to be in hdf. We share our environment in FrameDet.yml
+**Env:** The input for multicut solver needs to be in hdf. We share our environment in `FrameDet.yml`.
 
 ```
 conda env create -f FrameDet.yml
 ```
+<br>
 
-Image Embedding: We mainly use the [transformers library](https://huggingface.co/docs/transformers/en/index) and install [dinov2](https://github.com/facebookresearch/dinov2) as explained on github.
+**Image Embedding**: We mainly use the [transformers library](https://huggingface.co/docs/transformers/en/index) and install [dinov2](https://github.com/facebookresearch/dinov2) as explained on github.
 
-Multi-Cut: We use the implementation by [B. Andres et al.](https://github.com/bjoern-andres/graph.git). We use [ccmake](https://cmake.org/cmake/help/latest/manual/ccmake.1.html) to compile the C++ code.
 
-Datasets: We use [ImageNette, ImageWoof](https://github.com/fastai/imagenette?tab=readme-ov-file), and [ClimateTV](https://github.com/KathPra/Datasets_ClimateVisions). Please make sure to have one folder per dataset which can enter into the embedding script.
+**Multi-Cut**: We use the implementation by [B. Andres et al.](https://github.com/bjoern-andres/graph.git). We use [ccmake](https://cmake.org/cmake/help/latest/manual/ccmake.1.html) to compile the C++ code.
+
+
+**Datasets**: We use [ImageNette, ImageWoof](https://github.com/fastai/imagenette?tab=readme-ov-file), and [ClimateTV](https://github.com/KathPra/Datasets_ClimateVisions). Please make sure to have one folder per dataset which can enter into the embedding script.
+
+## Experiments
+1. Embed input - fix paths within script
+```
+python emb/convnextv2.py
+```
+<br>
+
+2. Compute cosine similarities
+```
+python graph_prep/cossim.py --dataset imagenette --model_config inception_resnet_v2 --embs path2embeddings/embs/ --setting ablation
+```
+<br>
+
+3. Create graph
+```
+python python scripts/graph_mapping.py --dataset imagenette --model_config inception_resnet_v2 --embs path2embeddings/embs/ --split eval
+```
+<br>
+
+4. Select hyperparameter *cal* from below table or compute your own. - fix paths within script
+```
+python graph_prep/ablate_bias.py
+```
+5. Use MP solver to retrieve clusters. Please provide input (-i) and output (-o) file paths and calibration term (-b).
+```
+cd ../graph
+./solve-regular -i path2input_file/input_train.txt -o path2output_file/output_train.h5 -b 0.4
+```
 
 ## Calibration Terms
 In our work we ablate the calibration term cal on two datasets, ImageNette and ImageWoof. We share our ablated cal terms for use while encouraging authors to ablate their own cal terms when their use case differs from ours.
