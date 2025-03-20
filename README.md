@@ -71,18 +71,6 @@ In our work we ablate the calibration term cal on two datasets, ImageNette and I
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Flipped Table</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
     <table>
